@@ -1,11 +1,7 @@
 name: iot-example-graphical-snap  # you probably want to 'snapcraft register <name>'
 version: git # just for humans, typically '1.2+git' or '1.3.2'
-summary: Single-line elevator pitch for your amazing snap # 79 char long summary
-description: |
-  This is my-snap's description. You have a paragraph or two to tell the
-  most important story about your snap. Keep it under 100 words though,
-  we live in tweetspace and your description wants to look good in the snap
-  store.
+summary: IoT example using X11 # 79 char long summary
+description: IoT example using X11
 confinement: strict
 compression: lzo
 grade: stable
@@ -15,12 +11,15 @@ apps:
   iot-example-graphical-snap:
     command-chain:
       - bin/wayland-launch
-    command: # Command to launch your application
+      - env-setup
+      - usr/local/bin/x11_kiosk_launch
+    command: usr/bin/glxgears
     daemon: simple
     restart-condition: always
     plugs:
       - opengl
       - wayland
+      - network-bind
 
 # This is one of four snippets that relate to providing the userspace graphics needed by your application.
 # You can treat this as "magic" so long as you don't need to make changes.
@@ -62,9 +61,22 @@ layout:
     bind: $SNAP/usr/share/sounds
   /etc/fonts:
     bind: $SNAP/etc/fonts
+  # glxgears
+  /usr/bin/xkbcomp:
+    symlink: $SNAP/usr/bin/xkbcomp
+  /usr/share/X11:
+    bind: $SNAP/usr/share/X11
 
 parts:
-  # Your application packaging goes here
+  glxgears:
+    plugin: nil
+    stage-packages:
+      - mesa-utils
+    stage-snaps: [mir-kiosk-x11]
+    override-prime: |
+      snapcraftctl prime
+      # We don't need the GL setup magic from mir-kiosk-x11 (we have our own)
+      rm -f "$SNAPCRAFT_PRIME/hacks/setup-gl"
 
   # Some utility scripts for setting up the Wayland environment
   wayland-launch:
@@ -84,7 +96,7 @@ parts:
   # This ensures that your snap doesn't contain its own copy of the userspace drivers
   cleanup:
     after:
-      # Your application packaging
+      - glxgears
       - wayland-launch
     plugin: nil
     build-snaps: [ mesa-core20 ]
