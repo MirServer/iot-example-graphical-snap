@@ -84,6 +84,11 @@ parts:
   # these from the host environment.
   terminal:
     plugin: nil
+    stage-packages:
+      - xfce4-terminal
+
+  gsettings+pixbuf:
+    plugin: nil
     build-packages:
       - libgdk-pixbuf2.0-0
       - librsvg2-common
@@ -92,7 +97,6 @@ parts:
       # Update mime database
       update-mime-database ${SNAPCRAFT_PART_INSTALL}/usr/share/mime
     stage-packages:
-      - xfce4-terminal
       - librsvg2-common
       - gsettings-desktop-schemas
       - libglib2.0-bin
@@ -126,6 +130,7 @@ parts:
     after:
       - colossal-cave-adventure
       - terminal
+      - gsettings+pixbuf
       - wayland-launch
     plugin: nil
     build-snaps: [ mesa-core20 ]
