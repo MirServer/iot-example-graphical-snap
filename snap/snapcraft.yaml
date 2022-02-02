@@ -11,7 +11,7 @@ apps:
   iot-example-graphical-snap:
     command-chain:
       - bin/wayland-launch
-    command: usr/bin/xfce4-terminal  --hide-menubar --hide-toolbar --hide-borders --command $SNAP/usr/share/colossal-cave-adventure/colossal-cave-adventure
+    command: usr/bin/xfce4-terminal  --hide-menubar --hide-toolbar --command $SNAP/usr/share/colossal-cave-adventure/colossal-cave-adventure-wrapper
     daemon: simple
     restart-condition: always
     plugs:
@@ -71,7 +71,8 @@ layout:
 
 parts:
   colossal-cave-adventure:
-    plugin: nil
+    plugin: dump
+    source: colossal-cave-adventure
     override-pull: |
       snapcraftctl pull
       version=`LANG=C apt-cache policy colossal-cave-adventure | sed -rne 's/^\s+Candidate:\s+([^-]*)-.+$/\1/p'`
